@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2f5bd3">
+<title>Hub Today</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-first column — capture at the top, today's list, journal, projects. */
+:root {
+  --bg: #f3f5f8; --surface: #ffffff; --ink: #1b2230; --muted: #5d6676; --line: #dde2ea;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --accent-soft: #e6ecfb;
+  --danger: #b93a26; --danger-soft: #fbe9e5; --warn: #9a6512; --ok: #2b7d50; --ok-soft: #e3f3ea;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11141a; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b2; --line: #2b323e;
+  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #232c45;
+  --danger: #f08a75; --danger-soft: #3a211d; --warn: #e2b55e; --ok: #74cc9b; --ok-soft: #1c3226;
+  color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11141a; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b2; --line: #2b323e;
+  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #232c45;
+  --danger: #f08a75; --danger-soft: #3a211d; --warn: #e2b55e; --ok: #74cc9b; --ok-soft: #1c3226;
+  color-scheme: dark; }
+
+* { box-sizing: border-box; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 640px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 22px; }
+h1, h2 { margin: 0; text-wrap: balance; }
+h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
+h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+a { color: var(--accent); }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.datestamp { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.sync { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 500; }
+.btn:disabled { opacity: .55; cursor: default; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 12px; }
+.section { display: grid; gap: 10px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.section-head a { font-size: 13px; }
+
+/* Quick add */
+.qa-name { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 16px; }
+.qa-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.qa-row > * { min-width: 0; }
+.field { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 7px 9px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: var(--bg); padding: 7px 11px; cursor: pointer; border-right: 1px solid var(--line); }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+.qa-row .grow { flex: 1 1 140px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; }
+.tab { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; cursor: pointer; font-size: 13.5px; }
+.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.count { font-family: var(--font-mono); font-size: 12px; margin-left: 4px; opacity: .8; }
+
+/* Task list */
+.list { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
+.task { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 11px 12px; border-top: 1px solid var(--line); align-items: start; }
+.task:first-child { border-top: 0; }
+.task.overdue { box-shadow: inset 3px 0 0 var(--danger); }
+.check { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
+.task-main { min-width: 0; display: grid; gap: 4px; }
+.task-name { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
+.task-name:hover { text-decoration: underline; }
+.task.done .task-name { text-decoration: line-through; color: var(--muted); }
+.meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.chip { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; line-height: 20px; white-space: nowrap; }
+.chip.p-High { color: var(--danger); border-color: currentColor; }
+.chip.p-Med { color: var(--warn); border-color: currentColor; }
+.chip.late { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
+.empty { padding: 16px 12px; color: var(--muted); font-size: 14px; }
+.subhead { padding: 8px 12px 4px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--danger); border-top: 1px solid var(--line); }
+.subhead:first-child { border-top: 0; }
+.subhead.plain { color: var(--muted); }
+
+/* Journal */
+.j-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.j-title strong { font-family: var(--font-mono); font-weight: 500; }
+.moods { display: flex; flex-wrap: wrap; gap: 6px; }
+.mood { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-size: 13.5px; }
+.mood[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.log-row { display: flex; gap: 8px; }
+.log-row input { flex: 1; min-width: 0; }
+
+/* Projects */
+.proj { display: grid; gap: 6px; padding: 12px; border-top: 1px solid var(--line); }
+.proj:first-child { border-top: 0; }
+.proj-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.proj-top a { color: var(--ink); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.proj-top a:hover { text-decoration: underline; }
+.bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--ok); border-radius: inherit; }
+.proj-meta { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); }
+
+/* Notices */
+.notice { border-radius: var(--r); padding: 12px 14px; background: var(--danger-soft); color: var(--danger); font-size: 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  background: var(--ink); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-size: 14px; max-width: calc(100% - 32px); z-index: 20; }
+.skeleton { color: var(--muted); font-size: 14px; padding: 14px 12px; }
+@media (prefers-reduced-motion: no-preference) { .bar span { transition: width .4s ease; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="datestamp" id="datestamp"></div>
+      <h1>Hub Today</h1>
+    </div>
+    <div class="sync">
+      <span id="syncText">Connecting to Notion…</span>
+      <button class="btn" id="refreshBtn" type="button">Refresh</button>
+    </div>
+  </header>
+
+  <div class="notice" id="notice" hidden><span id="noticeText"></span><button class="btn" id="noticeRetry" type="button">Try again</button></div>
+
+  <form class="panel" id="qaForm" autocomplete="off">
+    <input class="qa-name" id="qaName" placeholder="Add a task…" aria-label="Task name" required>
+    <div class="qa-row">
+      <input class="field" type="date" id="qaDue" aria-label="Due date">
+      <div class="seg" role="group" aria-label="Priority" id="qaPrio">
+        <button type="button" data-p="High">High</button>
+        <button type="button" data-p="Med" aria-pressed="true">Med</button>
+        <button type="button" data-p="Low">Low</button>
+      </div>
+      <select class="field grow" id="qaProject" aria-label="Project"><option value="">No project</option></select>
+      <button class="btn btn-primary" id="qaSubmit" type="submit">Add task</button>
+    </div>
+    <p class="hint">Reminders aren't set from here. To get a push reminder, open the task in Notion, tap Due and turn on Remind.</p>
+  </form>
+
+  <section class="section" aria-labelledby="tasksH">
+    <div class="section-head">
+      <h2 id="tasksH">Tasks</h2>
+      <a id="linkTasks" href="#" target="_blank" rel="noopener" hidden>Open Tasks in Notion</a>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tabToday" aria-selected="true" type="button">Today<span class="count" id="cToday"></span></button>
+      <button class="tab" role="tab" id="tabNext" aria-selected="false" type="button">Next 7 days<span class="count" id="cNext"></span></button>
+    </div>
+    <ul class="list" id="taskList"><li class="skeleton">Loading your tasks…</li></ul>
+  </section>
+
+  <section class="section" aria-labelledby="jH">
+    <div class="section-head">
+      <h2 id="jH">Journal</h2>
+      <a id="linkJournal" href="#" target="_blank" rel="noopener" hidden>All entries</a>
+    </div>
+    <div class="panel" id="journal"><div class="skeleton">Looking for today's entry…</div></div>
+  </section>
+
+  <section class="section" aria-labelledby="pH">
+    <div class="section-head">
+      <h2 id="pH">Active projects</h2>
+      <a id="linkProjects" href="#" target="_blank" rel="noopener" hidden>All projects</a>
+    </div>
+    <div class="list" id="projects"><div class="skeleton">Loading projects…</div></div>
+  </section>
+
+  <p class="hint">Everything here reads and writes your Notion Productivity Hub. <a href="https://www.notion.so" target="_blank" rel="noopener">Open Notion</a></p>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  const MOODS = ["😄 Great", "🙂 Good", "😐 Okay", "😕 Low", "😞 Rough"];
+  const PRIO_ORDER = { High: 0, Med: 1, Low: 2 };
+  const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  const $ = (id) => document.getElementById(id);
+  const state = { tasks: [], projects: [], journal: null, tab: "today", prio: "Med", busy: false, loaded: false, justDone: new Set() };
+
+  // ---------- dates ----------
+  const pad = (n) => String(n).padStart(2, "0");
+  const ymd = (d) => d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  const parseYmd = (s) => { const [y, m, d] = s.slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d); };
+  const today = () => ymd(new Date());
+  const plusDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+  const shortDate = (s) => { const d = parseYmd(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
+  function dueLabel(s) {
+    const t = today();
+    if (s === t) return "Today";
+    if (s === plusDays(t, 1)) return "Tomorrow";
+    if (s === plusDays(t, -1)) return "Yesterday";
+    return shortDate(s);
+  }
+
+  // ---------- helpers ----------
+  const idOf = (url) => { const m = String(url || "").replace(/-/g, "").match(/[0-9a-f]{32}/i); return m ? m[0].toLowerCase() : ""; };
+  function el(tag, props, ...kids) {
+    const n = document.createElement(tag);
+    if (props) for (const k in props) {
+      if (k === "class") n.className = props[k];
+      else if (k === "text") n.textContent = props[k];
+      else if (k.startsWith("on")) n.addEventListener(k.slice(2), props[k]);
+      else if (props[k] !== undefined && props[k] !== null && props[k] !== false) n.setAttribute(k, props[k]);
+    }
+    for (const c of kids) if (c != null) n.append(c);
+    return n;
+  }
+  let toastTimer;
+  function toast(msg) {
+    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
+  }
+  function errMsg(e) {
+    const code = e && e.code;
+    switch (code) {
+      case "signed_out": return "Your sign-in has expired. Reload the page to sign in again.";
+      case "offline": return "You're offline or the server didn't answer. Check your connection, then tap Try again.";
+      case "not_configured": return "The server isn't set up yet: " + (e.message || "a setting is missing") + " See the README.";
+      case "notion_token": return "Notion rejected the server's integration token. Update NOTION_TOKEN in the Worker settings.";
+      case "notion_not_shared": return "Notion can't see the Productivity Hub. In Notion, open the Hub → ••• → Connections and add the integration.";
+      case "notion_busy": return "Notion is busy. Wait a moment, then tap Try again.";
+      case "notion_error": return "Notion refused the request: " + (e.message || "no reason given");
+      default: return (e && e.message ? e.message : "Something went wrong") + (code ? " (" + code + ")" : "") + ". Tap Try again.";
+    }
+  }
+  function showNotice(msg) { $("noticeText").textContent = msg; $("notice").hidden = false; }
+  function hideNotice() { $("notice").hidden = true; }
+
+  // Same-origin API served by the Cloudflare Worker at /api/*.
+  async function api(method, path, data) {
+    let r;
+    try {
+      r = await fetch(path, {
+        method, credentials: "same-origin", redirect: "manual", cache: "no-store",
+        headers: data ? { "content-type": "application/json" } : {},
+        body: data ? JSON.stringify(data) : undefined
+      });
+    } catch (e) { throw { code: "offline" }; }
+    // Cloudflare Access answers an expired session with a redirect to its login page.
+    if (r.type === "opaqueredirect" || r.status === 401 || r.status === 403 && !(r.headers.get("content-type") || "").includes("json")) throw { code: "signed_out" };
+    let body = null;
+    try { body = await r.json(); } catch (e) { }
+    if (!r.ok) throw { code: (body && body.error) || "http_" + r.status, message: body && body.message };
+    return body;
+  }
+  function setLink(id, url) { const a = $(id); if (url) { a.href = url; a.hidden = false; } else a.hidden = true; }
+
+  // ---------- load ----------
+  async function load() {
+    if (state.busy) return;
+    state.busy = true; $("refreshBtn").disabled = true; $("syncText").textContent = "Syncing…";
+    let failed = false;
+    try {
+      const s = await api("GET", "/api/state?today=" + today());
+      state.tasks = s.tasks || []; state.projects = s.projects || []; state.journal = s.journal || null;
+      const links = s.links || {};
+      setLink("linkTasks", links.tasks); setLink("linkProjects", links.projects); setLink("linkJournal", links.journal);
+      hideNotice(); state.loaded = true;
+      const now = new Date();
+      $("syncText").textContent = "Synced " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+    } catch (e) {
+      failed = true;
+      showNotice(errMsg(e));
+      if (e && ["signed_out", "notion_token", "not_configured"].includes(e.code)) { state.tasks = []; state.projects = []; state.journal = null; }
+      $("syncText").textContent = state.loaded ? "Last sync failed" : "Not connected";
+    }
+    state.busy = false; $("refreshBtn").disabled = false;
+    renderAll(failed ? { t: true, p: true, j: true } : {});
+  }
+
+  // ---------- render ----------
+  function renderAll(failed = {}) {
+    $("datestamp").textContent = today() + " " + DAYS[new Date().getDay()];
+    renderProjectSelect();
+    renderTasks(failed.t);
+    renderJournal(failed.j);
+    renderProjects(failed.p);
+  }
+  function projectName(id) { const p = state.projects.find((x) => x.id === id); return p ? p.name : ""; }
+  const byPrio = (a, b) => (PRIO_ORDER[a.prio] ?? 3) - (PRIO_ORDER[b.prio] ?? 3) || (a.due || "9").localeCompare(b.due || "9");
+
+  function renderTasks(failed) {
+    const list = $("taskList"); list.replaceChildren();
+    const t = today(), end = plusDays(t, 7);
+    const visible = state.tasks.filter((x) => !x.done || state.justDone.has(x.id));
+    const overdue = visible.filter((x) => x.due && x.due < t).sort(byPrio);
+    const dueToday = visible.filter((x) => x.due === t).sort(byPrio);
+    const next = visible.filter((x) => x.due > t && x.due <= end).sort((a, b) => a.due.localeCompare(b.due) || byPrio(a, b));
+    const openCount = (arr) => arr.filter((x) => !x.done).length;
+    $("cToday").textContent = openCount(overdue) + openCount(dueToday) ? String(openCount(overdue) + openCount(dueToday)) : "";
+    $("cNext").textContent = openCount(next) ? String(openCount(next)) : "";
+    $("tabToday").setAttribute("aria-selected", state.tab === "today");
+    $("tabNext").setAttribute("aria-selected", state.tab === "next");
+
+    if (failed && !state.tasks.length) { list.append(el("li", { class: "empty", text: "Tasks couldn't load. See the message above." })); return; }
+    if (!state.loaded && !state.tasks.length) { list.append(el("li", { class: "empty", text: "Waiting for Notion…" })); return; }
+    if (state.tab === "today") {
+      if (!overdue.length && !dueToday.length) { list.append(el("li", { class: "empty", text: "Nothing due today. Add a task above or check Next 7 days." })); return; }
+      if (overdue.length) { list.append(el("li", { class: "subhead", text: "Overdue" })); overdue.forEach((x) => list.append(taskRow(x, true))); }
+      if (dueToday.length) { if (overdue.length) list.append(el("li", { class: "subhead plain", text: "Due today" })); dueToday.forEach((x) => list.append(taskRow(x, false))); }
+    } else {
+      if (!next.length) { list.append(el("li", { class: "empty", text: "Nothing due in the next 7 days." })); return; }
+      next.forEach((x) => list.append(taskRow(x, false)));
+    }
+  }
+  function taskRow(x, late) {
+    const cb = el("input", { type: "checkbox", class: "check", "aria-label": "Mark " + x.name + " done" });
+    cb.checked = x.done;
+    cb.addEventListener("change", () => toggleDone(x, cb));
+    const meta = el("div", { class: "meta" });
+    if (x.prio) meta.append(el("span", { class: "chip p-" + x.prio, text: x.prio }));
+    if (x.due) meta.append(el("span", { class: "chip mono" + (late && !x.done ? " late" : ""), text: dueLabel(x.due) }));
+    x.projects.forEach((pid) => { const n = projectName(pid); if (n) meta.append(el("span", { class: "chip", text: n })); });
+    if (x.parent.length) { const parent = state.tasks.find((t) => t.id === x.parent[0]); if (parent) meta.append(el("span", { class: "chip", text: "↳ " + parent.name })); }
+    return el("li", { class: "task" + (late ? " overdue" : "") + (x.done ? " done" : "") }, cb,
+      el("div", { class: "task-main" }, el("a", { class: "task-name", href: x.url, target: "_blank", rel: "noopener", text: x.name }), meta));
+  }
+
+  function renderProjectSelect() {
+    const sel = $("qaProject"); const keep = sel.value;
+    sel.replaceChildren(el("option", { value: "", text: "No project" }));
+    state.projects.filter((p) => p.status !== "Done").sort((a, b) => a.name.localeCompare(b.name))
+      .forEach((p) => sel.append(el("option", { value: p.id, text: p.name })));
+    sel.value = keep && [...sel.options].some((o) => o.value === keep) ? keep : "";
+  }
+
+  function renderProjects(failed) {
+    const box = $("projects"); box.replaceChildren();
+    const active = state.projects.filter((p) => p.status === "Active").sort((a, b) => (a.target || "9").localeCompare(b.target || "9"));
+    if (failed && !state.projects.length) { box.append(el("div", { class: "empty", text: "Projects couldn't load. See the message above." })); return; }
+    if (!active.length) { box.append(el("div", { class: "empty", text: state.loaded ? "No active projects. Set a project's Status to Active in Notion to see it here." : "Waiting for Notion…" })); return; }
+    active.forEach((p) => {
+      const ts = state.tasks.filter((t) => t.projects.includes(p.id));
+      const done = ts.filter((t) => t.done).length;
+      const pct = ts.length ? Math.round((done / ts.length) * 100) : 0;
+      const bar = el("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct), "aria-label": p.name + " progress" }, el("span"));
+      bar.firstChild.style.width = pct + "%";
+      box.append(el("div", { class: "proj" },
+        el("div", { class: "proj-top" }, el("a", { href: p.url, target: "_blank", rel: "noopener", text: p.name }), el("span", { class: "mono", text: pct + "%" })),
+        bar,
+        el("div", { class: "proj-meta" }, el("span", { text: ts.length ? done + " of " + ts.length + " tasks done" : "No tasks yet" }),
+          el("span", { class: "mono", text: p.target ? "Target " + shortDate(p.target) : (p.area || "") }))));
+    });
+  }
+
+  let pickedMood = "";
+  function renderJournal(failed) {
+    const box = $("journal"); box.replaceChildren();
+    if (failed && !state.journal) { box.append(el("div", { class: "empty", text: "The journal couldn't load. See the message above." })); return; }
+    if (!state.loaded && !state.journal) { box.append(el("div", { class: "empty", text: "Waiting for Notion…" })); return; }
+    const j = state.journal;
+    if (j) {
+      box.append(el("div", { class: "j-title" },
+        el("strong", { text: j.name || today() }),
+        el("span", { class: "hint", text: j.mood ? "Mood: " + j.mood : "" }),
+        el("a", { href: j.url, target: "_blank", rel: "noopener", text: "Open entry" })));
+      const input = el("input", { class: "field", id: "logInput", placeholder: "Add a line to today's log…", "aria-label": "Log line" });
+      const btn = el("button", { class: "btn btn-primary", type: "submit", text: "Add" });
+      const form = el("form", { class: "log-row", autocomplete: "off" }, input, btn);
+      form.addEventListener("submit", (ev) => { ev.preventDefault(); appendLog(j, input, btn); });
+      box.append(form, el("p", { class: "hint", text: "Each line is added to the end of today's entry with the time in front." }));
+    } else {
+      const d = new Date();
+      box.append(el("div", { class: "j-title" }, el("strong", { text: today() + " " + DAYS[d.getDay()] }), el("span", { class: "hint", text: "No entry yet" })));
+      const moods = el("div", { class: "moods", role: "group", "aria-label": "Mood" });
+      MOODS.forEach((m) => {
+        const b = el("button", { class: "mood", type: "button", "aria-pressed": String(pickedMood === m), text: m });
+        b.addEventListener("click", () => { pickedMood = pickedMood === m ? "" : m; renderJournal(); });
+        moods.append(b);
+      });
+      const start = el("button", { class: "btn btn-primary", type: "button", id: "startEntry", text: "Start today's entry" });
+      start.addEventListener("click", () => createEntry(start));
+      box.append(moods, el("div", {}, start), el("p", { class: "hint", text: "Creates the entry with the outline: Top 3 today, Notes / log, Wins, Tomorrow." }));
+    }
+  }
+
+  // ---------- actions ----------
+  async function toggleDone(x, cb) {
+    const nowDone = cb.checked;
+    cb.disabled = true;
+    try {
+      await api("PATCH", "/api/tasks/" + x.id, { done: nowDone });
+      cb.disabled = false;
+      x.done = nowDone; x.status = nowDone ? "Done" : "To do";
+      if (nowDone) state.justDone.add(x.id); else state.justDone.delete(x.id);
+      toast(nowDone ? "Marked done" : "Marked not done");
+      renderTasks(); renderProjects();
+    } catch (e) {
+      cb.checked = !nowDone; cb.disabled = false;
+      showNotice(errMsg(e));
+    }
+  }
+
+  async function addTask(ev) {
+    ev.preventDefault();
+    const name = $("qaName").value.trim(); if (!name) return;
+    const due = $("qaDue").value; const proj = $("qaProject").value;
+    const btn = $("qaSubmit"); btn.disabled = true; btn.textContent = "Adding…";
+    try {
+      const made = await api("POST", "/api/tasks", { name, due: due || "", priority: state.prio, project: proj || "" });
+      state.tasks.push({ url: made.url || "", id: made.id || "", name, done: false, status: "To do",
+        prio: state.prio, due: due || "", projects: proj ? [proj] : [], parent: [] });
+      $("qaName").value = "";
+      if (due && due > today() && due <= plusDays(today(), 7)) state.tab = "next";
+      else if (due && due <= today()) state.tab = "today";
+      toast(due ? "Task added, due " + dueLabel(due) : "Task added (no due date, so it's only in Notion's lists)");
+      hideNotice(); renderTasks(); renderProjects();
+    } catch (e) { showNotice(errMsg(e)); }
+    btn.disabled = false; btn.textContent = "Add task";
+  }
+
+  async function createEntry(btn) {
+    btn.disabled = true; btn.textContent = "Creating…";
+    const t = today(), name = t + " " + DAYS[new Date().getDay()];
+    try {
+      state.journal = await api("POST", "/api/journal", { date: t, name, mood: pickedMood });
+      pickedMood = ""; toast("Today's entry created"); hideNotice(); renderJournal();
+    } catch (e) { showNotice(errMsg(e)); btn.disabled = false; btn.textContent = "Start today's entry"; }
+  }
+
+  async function appendLog(j, input, btn) {
+    const text = input.value.trim(); if (!text) return;
+    const d = new Date(); const line = "- " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + " " + text.replace(/\n+/g, " ");
+    btn.disabled = true;
+    try {
+      await api("POST", "/api/journal/" + j.id + "/log", { line: line.slice(2) });
+      input.value = ""; toast("Added to today's entry"); hideNotice();
+    } catch (e) { showNotice(errMsg(e)); }
+    btn.disabled = false; input.focus();
+  }
+
+  // ---------- wiring ----------
+  $("qaDue").value = today();
+  $("qaForm").addEventListener("submit", addTask);
+  $("qaPrio").addEventListener("click", (ev) => {
+    const b = ev.target.closest("button[data-p]"); if (!b) return;
+    state.prio = b.dataset.p;
+    $("qaPrio").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  });
+  $("tabToday").addEventListener("click", () => { state.tab = "today"; renderTasks(); });
+  $("tabNext").addEventListener("click", () => { state.tab = "next"; renderTasks(); });
+  $("refreshBtn").addEventListener("click", () => { state.justDone.clear(); load(); });
+  $("noticeRetry").addEventListener("click", () => load());
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && state.loaded) load(); });
+  renderAll();
+
+  load();
+})();
+</script>
+</body>
+</html>
