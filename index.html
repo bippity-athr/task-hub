@@ -4,183 +4,285 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
-<meta name="theme-color" content="#2f5bd3">
+<meta name="theme-color" content="#f6f7f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11141a" media="(prefers-color-scheme: dark)">
 <title>Hub Today</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232f5bd3'/%3E%3Cpath d='M9 16.5l4.5 4.5L23 11.5' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-/* Layout: one phone-first column — capture at the top, today's list, journal, projects. */
+/* Layout: one quiet phone-first column. Date and summary, capture, today's list, journal, projects. */
 :root {
-  --bg: #f3f5f8; --surface: #ffffff; --ink: #1b2230; --muted: #5d6676; --line: #dde2ea;
-  --accent: #2f5bd3; --accent-ink: #ffffff; --accent-soft: #e6ecfb;
-  --danger: #b93a26; --danger-soft: #fbe9e5; --warn: #9a6512; --ok: #2b7d50; --ok-soft: #e3f3ea;
-  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bg: #f6f7f9; --surface: #ffffff; --ink: #161b26; --ink-2: #3a4252; --muted: #6b7383;
+  --line: #e4e7ed; --line-strong: #cbd1db;
+  --accent: #2f5bd3; --accent-ink: #ffffff; --accent-soft: #ebf0fc;
+  --danger: #c0392b; --danger-soft: #fcebe8; --warn: #a86200; --ok: #2b7d50;
+  --shadow: 0 1px 2px rgba(22, 27, 38, .05), 0 1px 1px rgba(22, 27, 38, .03);
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
-  --r: 10px;
+  --r-card: 12px; --r-ctl: 8px;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
-  --bg: #11141a; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b2; --line: #2b323e;
-  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #232c45;
-  --danger: #f08a75; --danger-soft: #3a211d; --warn: #e2b55e; --ok: #74cc9b; --ok-soft: #1c3226;
+  --bg: #11141a; --surface: #191e26; --ink: #e7eaf0; --ink-2: #c3c9d4; --muted: #8f98a8;
+  --line: #262c36; --line-strong: #3a4250;
+  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #1f2840;
+  --danger: #f08a75; --danger-soft: #34201c; --warn: #e2b55e; --ok: #74cc9b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   color-scheme: dark; } }
 :root[data-theme="dark"] {
-  --bg: #11141a; --surface: #1a1f28; --ink: #e6e9ef; --muted: #9aa3b2; --line: #2b323e;
-  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #232c45;
-  --danger: #f08a75; --danger-soft: #3a211d; --warn: #e2b55e; --ok: #74cc9b; --ok-soft: #1c3226;
+  --bg: #11141a; --surface: #191e26; --ink: #e7eaf0; --ink-2: #c3c9d4; --muted: #8f98a8;
+  --line: #262c36; --line-strong: #3a4250;
+  --accent: #86a2f7; --accent-ink: #0e1320; --accent-soft: #1f2840;
+  --danger: #f08a75; --danger-soft: #34201c; --warn: #e2b55e; --ok: #74cc9b;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3);
   color-scheme: dark; }
 
-* { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 [hidden] { display: none !important; }
-body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.45; }
-.wrap { max-width: 640px; margin: 0 auto; padding-block: 20px 48px;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid; gap: 22px; }
-h1, h2 { margin: 0; text-wrap: balance; }
-h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; }
-h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
-a { color: var(--accent); }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent; }
+h1, h2, p { margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
 button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.num { font-variant-numeric: tabular-nums; }
 
-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.datestamp { font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
-.sync { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
-.btn { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 7px 12px; cursor: pointer; }
-.btn:hover { border-color: var(--accent); }
-.btn-primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 500; }
-.btn:disabled { opacity: .55; cursor: default; }
+.wrap { max-width: 600px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 32px; }
 
-.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: grid; gap: 12px; }
-.section { display: grid; gap: 10px; }
-.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.section-head a { font-size: 13px; }
+/* Header */
+.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.top > div { min-width: 0; }
+.eyebrow { font-size: 12px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+h1 { margin-top: 2px; font-size: 28px; line-height: 1.15; font-weight: 600; letter-spacing: -0.02em; text-wrap: balance; }
+.summary { margin-top: 6px; color: var(--ink-2); font-size: 14px; }
+.summary .late { color: var(--danger); }
+.sync { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); padding-top: 2px; white-space: nowrap; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.dot[data-state="ok"] { background: var(--ok); }
+.dot[data-state="error"] { background: var(--danger); }
+.icon-btn { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface); color: var(--ink-2); }
+.icon-btn:hover { border-color: var(--line-strong); color: var(--ink); }
+.icon-btn:disabled { cursor: default; }
+
+/* Cards and sections */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow); }
+.section { display: grid; gap: 12px; }
+.section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+h2 { font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.section-head a { font-size: 13px; color: var(--muted); }
+.section-head a:hover { color: var(--accent); }
+.hint { font-size: 12.5px; color: var(--muted); }
+
+/* Buttons and fields */
+.btn { border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-ctl); padding: 7px 14px; font-size: 14px; font-weight: 500; color: var(--ink-2); }
+.btn:hover { border-color: var(--line-strong); color: var(--ink); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); filter: brightness(1.06); }
+.btn:disabled { opacity: .5; cursor: default; filter: none; }
 
 /* Quick add */
-.qa-name { width: 100%; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 16px; }
-.qa-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-.qa-row > * { min-width: 0; }
-.field { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 7px 9px; }
-.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.seg button { border: 0; background: var(--bg); padding: 7px 11px; cursor: pointer; border-right: 1px solid var(--line); }
-.seg button:last-child { border-right: 0; }
-.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
-.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
-.qa-row .grow { flex: 1 1 140px; }
+.add { display: grid; }
+.add-line { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; }
+.add-line svg { color: var(--muted); flex: none; }
+.add-line input { flex: 1; min-width: 0; border: 0; background: transparent; font-size: 16px; padding: 6px 0; outline: none; }
+.add-line input::placeholder { color: var(--muted); }
+.add:focus-within { border-color: var(--line-strong); }
+.add-opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; border-top: 1px solid var(--line); }
+.opt { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 3px 4px 3px 12px; font-size: 13.5px; color: var(--muted); min-width: 0; }
+.opt input, .opt select { border: 0; background: transparent; color: var(--ink); padding: 3px 6px; border-radius: 999px; min-width: 0; font-size: 13.5px; }
+.opt.grow { flex: 1 1 150px; }
+.opt.grow select { flex: 1; width: 100%; }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border: 1px solid var(--line); border-radius: 999px; }
+.seg button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: transparent; padding: 3px 10px; border-radius: 999px; font-size: 13.5px; color: var(--muted); }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--ink); font-weight: 500; }
+.pdot { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.pdot.High { background: var(--danger); }
+.pdot.Med { background: var(--warn); }
+.add + .hint { margin-top: -20px; padding-left: 2px; }
 
 /* Tabs */
-.tabs { display: flex; gap: 6px; }
-.tab { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; cursor: pointer; font-size: 13.5px; }
-.tab[aria-selected="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.count { font-family: var(--font-mono); font-size: 12px; margin-left: 4px; opacity: .8; }
+.tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--line); padding: 4px 16px 0; }
+.tab { border: 0; background: none; padding: 6px 0 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--muted); font-size: 14.5px; font-weight: 500; display: inline-flex; align-items: center; gap: 7px; }
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+.count { font-family: var(--font-mono); font-size: 11.5px; line-height: 18px; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--line); color: var(--ink-2); text-align: center; }
+.count:empty { display: none; }
 
 /* Task list */
-.list { list-style: none; margin: 0; padding: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); }
-.task { display: grid; grid-template-columns: auto 1fr; gap: 10px; padding: 11px 12px; border-top: 1px solid var(--line); align-items: start; }
-.task:first-child { border-top: 0; }
-.task.overdue { box-shadow: inset 3px 0 0 var(--danger); }
-.check { width: 22px; height: 22px; margin: 1px 0 0; accent-color: var(--accent); cursor: pointer; }
-.task-main { min-width: 0; display: grid; gap: 4px; }
-.task-name { color: var(--ink); text-decoration: none; overflow-wrap: anywhere; }
-.task-name:hover { text-decoration: underline; }
+.list { list-style: none; margin: 0; padding: 0; }
+.task { display: grid; grid-template-columns: auto 1fr; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); align-items: start; }
+.task:first-child, .subhead + .task { border-top: 0; }
+.check { appearance: none; -webkit-appearance: none; margin: 1px 0 0; width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--line-strong);
+  background: var(--surface); display: grid; place-content: center; cursor: pointer; flex: none; }
+.check::before { content: ""; width: 10px; height: 10px; background: var(--accent-ink); transform: scale(0);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%); }
+.check:hover { border-color: var(--accent); }
+.check:checked { background: var(--accent); border-color: var(--accent); }
+.check:checked::before { transform: scale(1); }
+.check:disabled { opacity: .5; cursor: default; }
+.task-main { min-width: 0; display: grid; gap: 2px; }
+.task-name { color: var(--ink); overflow-wrap: anywhere; }
+.task.done { opacity: .55; }
 .task.done .task-name { text-decoration: line-through; color: var(--muted); }
-.meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: 12.5px; color: var(--muted); }
-.chip { border: 1px solid var(--line); border-radius: 999px; padding: 0 8px; line-height: 20px; white-space: nowrap; }
-.chip.p-High { color: var(--danger); border-color: currentColor; }
-.chip.p-Med { color: var(--warn); border-color: currentColor; }
-.chip.late { background: var(--danger-soft); color: var(--danger); border-color: transparent; }
-.empty { padding: 16px 12px; color: var(--muted); font-size: 14px; }
-.subhead { padding: 8px 12px 4px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--danger); border-top: 1px solid var(--line); }
+.meta { display: flex; flex-wrap: wrap; align-items: center; font-size: 12.5px; color: var(--muted); }
+.meta > * + *::before { content: "·"; margin: 0 7px; color: var(--line-strong); }
+.meta .prio { display: inline-flex; align-items: center; gap: 5px; }
+.meta .late { color: var(--danger); }
+.parent { font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.subhead { padding: 12px 16px 2px; font-size: 11.5px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--line); }
 .subhead:first-child { border-top: 0; }
-.subhead.plain { color: var(--muted); }
+.subhead.late { color: var(--danger); }
+.empty { padding: 22px 16px; color: var(--muted); font-size: 14px; }
+.empty strong { display: block; color: var(--ink-2); font-weight: 500; margin-bottom: 2px; }
+
+/* Loading placeholders */
+.skel { display: grid; grid-template-columns: 20px 1fr; gap: 12px; padding: 14px 16px; border-top: 1px solid var(--line); align-items: center; }
+.skel:first-child { border-top: 0; }
+.skel i { display: block; height: 10px; border-radius: 5px; background: var(--line); }
+.skel i:first-child { width: 20px; height: 20px; border-radius: 50%; }
+.skel i:last-child { width: 58%; }
+.skel:nth-child(2) i:last-child { width: 42%; }
 
 /* Journal */
-.j-title { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.j-title strong { font-family: var(--font-mono); font-weight: 500; }
+.journal { padding: 16px; display: grid; gap: 14px; }
+.journal .empty, .journal .skel { padding: 4px 0; }
+.j-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.j-date { font-family: var(--font-mono); font-size: 15px; font-weight: 500; margin-top: 2px; }
+.mood-tag { font-size: 13px; color: var(--ink-2); border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; }
 .moods { display: flex; flex-wrap: wrap; gap: 6px; }
-.mood { border: 1px solid var(--line); background: var(--bg); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-size: 13.5px; }
-.mood[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
-.log-row { display: flex; gap: 8px; }
-.log-row input { flex: 1; min-width: 0; }
+.mood { border: 1px solid var(--line); background: transparent; border-radius: 999px; padding: 4px 11px; font-size: 13.5px; color: var(--ink-2); }
+.mood:hover { border-color: var(--line-strong); }
+.mood[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
+.inline-input { display: flex; gap: 8px; }
+.inline-input input { flex: 1; min-width: 0; border: 1px solid var(--line); background: var(--bg); border-radius: var(--r-ctl); padding: 8px 12px; font-size: 15px; }
+.inline-input input:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+.j-foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.j-foot a { font-size: 13px; }
 
 /* Projects */
-.proj { display: grid; gap: 6px; padding: 12px; border-top: 1px solid var(--line); }
+.proj { display: grid; gap: 8px; padding: 14px 16px; border-top: 1px solid var(--line); }
 .proj:first-child { border-top: 0; }
-.proj-top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
-.proj-top a { color: var(--ink); text-decoration: none; font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
-.proj-top a:hover { text-decoration: underline; }
-.bar { height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
-.bar span { display: block; height: 100%; background: var(--ok); border-radius: inherit; }
-.proj-meta { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); }
+.proj-top { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+.proj-top a { color: var(--ink); font-weight: 500; overflow-wrap: anywhere; min-width: 0; }
+.proj-top .mono { font-size: 13px; color: var(--ink-2); }
+.bar { height: 4px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.bar span { display: block; height: 100%; background: var(--accent); border-radius: inherit; }
+.bar.full span { background: var(--ok); }
+.proj-meta { display: flex; justify-content: space-between; gap: 12px; font-size: 12.5px; color: var(--muted); }
 
 /* Notices */
-.notice { border-radius: var(--r); padding: 12px 14px; background: var(--danger-soft); color: var(--danger); font-size: 14px; display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
-.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom, 0px));
-  background: var(--ink); color: var(--bg); padding: 9px 14px; border-radius: 8px; font-size: 14px; max-width: calc(100% - 32px); z-index: 20; }
-.skeleton { color: var(--muted); font-size: 14px; padding: 14px 12px; }
-@media (prefers-reduced-motion: no-preference) { .bar span { transition: width .4s ease; } }
+.notice { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  border: 1px solid color-mix(in srgb, var(--danger) 30%, transparent); background: var(--danger-soft); color: var(--danger);
+  border-radius: var(--r-card); padding: 12px 14px; font-size: 14px; }
+.notice span { flex: 1 1 260px; min-width: 0; }
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 999px; font-size: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  max-width: calc(100% - 32px); z-index: 20; }
+footer { text-align: center; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .bar span { transition: width .45s ease; }
+  .check, .check::before, .seg button, .tab { transition: background-color .15s, border-color .15s, color .15s, transform .15s; }
+  .task { transition: opacity .2s; }
+  .icon-btn[aria-busy="true"] svg { animation: spin .9s linear infinite; }
+  .dot[data-state="busy"] { animation: pulse 1.2s ease-in-out infinite; }
+  .skel i { animation: pulse 1.4s ease-in-out infinite; }
+  .toast:not([hidden]) { animation: rise .2s ease-out; }
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 50% { opacity: .45; } }
+@keyframes rise { from { opacity: 0; transform: translate(-50%, 6px); } }
+
+@media (max-width: 420px) {
+  h1 { font-size: 25px; }
+  .sync #syncText { display: none; }
+  .wrap { gap: 28px; }
+}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header class="top">
     <div>
-      <div class="datestamp" id="datestamp"></div>
-      <h1>Hub Today</h1>
+      <p class="eyebrow" id="eyebrow">Hub Today</p>
+      <h1 id="dateTitle">Today</h1>
+      <p class="summary" id="summary">Connecting to Notion…</p>
     </div>
     <div class="sync">
-      <span id="syncText">Connecting to Notion…</span>
-      <button class="btn" id="refreshBtn" type="button">Refresh</button>
+      <span class="dot" id="syncDot" data-state="busy" aria-hidden="true"></span>
+      <span id="syncText">Syncing…</span>
+      <button class="icon-btn" id="refreshBtn" type="button" aria-label="Refresh from Notion" title="Refresh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 4v5h-5"/></svg>
+      </button>
     </div>
   </header>
 
-  <div class="notice" id="notice" hidden><span id="noticeText"></span><button class="btn" id="noticeRetry" type="button">Try again</button></div>
+  <div class="notice" id="notice" role="alert" hidden><span id="noticeText"></span><button class="btn" id="noticeRetry" type="button">Try again</button></div>
 
-  <form class="panel" id="qaForm" autocomplete="off">
-    <input class="qa-name" id="qaName" placeholder="Add a task…" aria-label="Task name" required>
-    <div class="qa-row">
-      <input class="field" type="date" id="qaDue" aria-label="Due date">
-      <div class="seg" role="group" aria-label="Priority" id="qaPrio">
-        <button type="button" data-p="High">High</button>
-        <button type="button" data-p="Med" aria-pressed="true">Med</button>
-        <button type="button" data-p="Low">Low</button>
-      </div>
-      <select class="field grow" id="qaProject" aria-label="Project"><option value="">No project</option></select>
-      <button class="btn btn-primary" id="qaSubmit" type="submit">Add task</button>
+  <form class="card add" id="qaForm" autocomplete="off">
+    <div class="add-line">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      <input id="qaName" placeholder="Add a task" aria-label="Task name" required maxlength="500">
+      <button class="btn btn-primary" id="qaSubmit" type="submit">Add</button>
     </div>
-    <p class="hint">Reminders aren't set from here. To get a push reminder, open the task in Notion, tap Due and turn on Remind.</p>
+    <div class="add-opts">
+      <label class="opt">Due<input type="date" id="qaDue"></label>
+      <div class="seg" role="group" aria-label="Priority" id="qaPrio">
+        <button type="button" data-p="High" aria-pressed="false"><span class="pdot High"></span>High</button>
+        <button type="button" data-p="Med" aria-pressed="true"><span class="pdot Med"></span>Med</button>
+        <button type="button" data-p="Low" aria-pressed="false"><span class="pdot Low"></span>Low</button>
+      </div>
+      <label class="opt grow">Project<select id="qaProject"><option value="">None</option></select></label>
+    </div>
   </form>
+  <p class="hint">Reminders are set in Notion: open the task, tap Due, turn on Remind.</p>
 
   <section class="section" aria-labelledby="tasksH">
     <div class="section-head">
       <h2 id="tasksH">Tasks</h2>
-      <a id="linkTasks" href="#" target="_blank" rel="noopener" hidden>Open Tasks in Notion</a>
+      <a id="linkTasks" href="#" target="_blank" rel="noopener" hidden>Open in Notion ↗</a>
     </div>
-    <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tabToday" aria-selected="true" type="button">Today<span class="count" id="cToday"></span></button>
-      <button class="tab" role="tab" id="tabNext" aria-selected="false" type="button">Next 7 days<span class="count" id="cNext"></span></button>
+    <div class="card">
+      <div class="tabs" role="tablist" aria-label="Task lists">
+        <button class="tab" role="tab" id="tabToday" aria-selected="true" aria-controls="taskList" type="button">Today <span class="count" id="cToday"></span></button>
+        <button class="tab" role="tab" id="tabNext" aria-selected="false" aria-controls="taskList" type="button">Next 7 days <span class="count" id="cNext"></span></button>
+      </div>
+      <ul class="list" id="taskList" role="tabpanel" aria-live="polite">
+        <li class="skel" aria-hidden="true"><i></i><i></i></li>
+        <li class="skel" aria-hidden="true"><i></i><i></i></li>
+        <li class="skel" aria-hidden="true"><i></i><i></i></li>
+      </ul>
     </div>
-    <ul class="list" id="taskList"><li class="skeleton">Loading your tasks…</li></ul>
   </section>
 
   <section class="section" aria-labelledby="jH">
     <div class="section-head">
       <h2 id="jH">Journal</h2>
-      <a id="linkJournal" href="#" target="_blank" rel="noopener" hidden>All entries</a>
+      <a id="linkJournal" href="#" target="_blank" rel="noopener" hidden>All entries ↗</a>
     </div>
-    <div class="panel" id="journal"><div class="skeleton">Looking for today's entry…</div></div>
+    <div class="card journal" id="journal">
+      <div class="skel" aria-hidden="true"><i></i><i></i></div>
+    </div>
   </section>
 
   <section class="section" aria-labelledby="pH">
     <div class="section-head">
       <h2 id="pH">Active projects</h2>
-      <a id="linkProjects" href="#" target="_blank" rel="noopener" hidden>All projects</a>
+      <a id="linkProjects" href="#" target="_blank" rel="noopener" hidden>All projects ↗</a>
     </div>
-    <div class="list" id="projects"><div class="skeleton">Loading projects…</div></div>
+    <div class="card" id="projects">
+      <div class="skel" aria-hidden="true"><i></i><i></i></div>
+    </div>
   </section>
 
-  <p class="hint">Everything here reads and writes your Notion Productivity Hub. <a href="https://www.notion.so" target="_blank" rel="noopener">Open Notion</a></p>
+  <footer class="hint">Synced with your Notion Productivity Hub · <a href="https://www.notion.so" target="_blank" rel="noopener">Open Notion ↗</a></footer>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
@@ -189,7 +291,9 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
   const MOODS = ["😄 Great", "🙂 Good", "😐 Okay", "😕 Low", "😞 Rough"];
   const PRIO_ORDER = { High: 0, Med: 1, Low: 2 };
   const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const DAYS_LONG = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const MONTHS_LONG = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
   const $ = (id) => document.getElementById(id);
   const state = { tasks: [], projects: [], journal: null, tab: "today", prio: "Med", busy: false, loaded: false, justDone: new Set() };
@@ -200,31 +304,32 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
   const parseYmd = (s) => { const [y, m, d] = s.slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d); };
   const today = () => ymd(new Date());
   const plusDays = (s, n) => { const d = parseYmd(s); d.setDate(d.getDate() + n); return ymd(d); };
+  const daysBetween = (a, b) => Math.round((parseYmd(b) - parseYmd(a)) / 86400000);
   const shortDate = (s) => { const d = parseYmd(s); return DAYS[d.getDay()] + " " + d.getDate() + " " + MONTHS[d.getMonth()]; };
   function dueLabel(s) {
     const t = today();
     if (s === t) return "Today";
     if (s === plusDays(t, 1)) return "Tomorrow";
-    if (s === plusDays(t, -1)) return "Yesterday";
+    if (s < t) { const n = daysBetween(s, t); return n === 1 ? "Yesterday" : n + " days overdue"; }
     return shortDate(s);
   }
+  const plural = (n, word) => n + " " + word + (n === 1 ? "" : "s");
 
   // ---------- helpers ----------
-  const idOf = (url) => { const m = String(url || "").replace(/-/g, "").match(/[0-9a-f]{32}/i); return m ? m[0].toLowerCase() : ""; };
   function el(tag, props, ...kids) {
     const n = document.createElement(tag);
     if (props) for (const k in props) {
       if (k === "class") n.className = props[k];
       else if (k === "text") n.textContent = props[k];
-      else if (k.startsWith("on")) n.addEventListener(k.slice(2), props[k]);
       else if (props[k] !== undefined && props[k] !== null && props[k] !== false) n.setAttribute(k, props[k]);
     }
-    for (const c of kids) if (c != null) n.append(c);
+    for (const c of kids) if (c != null && c !== "") n.append(c);
     return n;
   }
   let toastTimer;
   function toast(msg) {
-    const t = $("toast"); t.textContent = msg; t.hidden = false;
+    const t = $("toast"); t.hidden = true; t.textContent = msg;
+    requestAnimationFrame(() => { t.hidden = false; });
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
   }
   function errMsg(e) {
@@ -242,6 +347,11 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
   }
   function showNotice(msg) { $("noticeText").textContent = msg; $("notice").hidden = false; }
   function hideNotice() { $("notice").hidden = true; }
+  function setSync(stateName, text) {
+    $("syncDot").dataset.state = stateName; $("syncText").textContent = text;
+    $("refreshBtn").setAttribute("aria-busy", String(stateName === "busy")); $("refreshBtn").disabled = stateName === "busy";
+    $("refreshBtn").title = text;
+  }
 
   // Same-origin API served by the Cloudflare Worker at /api/*.
   async function api(method, path, data) {
@@ -254,7 +364,7 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
       });
     } catch (e) { throw { code: "offline" }; }
     // Cloudflare Access answers an expired session with a redirect to its login page.
-    if (r.type === "opaqueredirect" || r.status === 401 || r.status === 403 && !(r.headers.get("content-type") || "").includes("json")) throw { code: "signed_out" };
+    if (r.type === "opaqueredirect" || r.status === 401 || (r.status === 403 && !(r.headers.get("content-type") || "").includes("json"))) throw { code: "signed_out" };
     let body = null;
     try { body = await r.json(); } catch (e) { }
     if (!r.ok) throw { code: (body && body.error) || "http_" + r.status, message: body && body.message };
@@ -265,7 +375,7 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
   // ---------- load ----------
   async function load() {
     if (state.busy) return;
-    state.busy = true; $("refreshBtn").disabled = true; $("syncText").textContent = "Syncing…";
+    state.busy = true; setSync("busy", "Syncing…");
     let failed = false;
     try {
       const s = await api("GET", "/api/state?today=" + today());
@@ -274,68 +384,94 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
       setLink("linkTasks", links.tasks); setLink("linkProjects", links.projects); setLink("linkJournal", links.journal);
       hideNotice(); state.loaded = true;
       const now = new Date();
-      $("syncText").textContent = "Synced " + pad(now.getHours()) + ":" + pad(now.getMinutes());
+      setSync("ok", "Synced " + pad(now.getHours()) + ":" + pad(now.getMinutes()));
     } catch (e) {
       failed = true;
       showNotice(errMsg(e));
       if (e && ["signed_out", "notion_token", "not_configured"].includes(e.code)) { state.tasks = []; state.projects = []; state.journal = null; }
-      $("syncText").textContent = state.loaded ? "Last sync failed" : "Not connected";
+      setSync("error", state.loaded ? "Last sync failed" : "Not connected");
     }
-    state.busy = false; $("refreshBtn").disabled = false;
+    state.busy = false;
     renderAll(failed ? { t: true, p: true, j: true } : {});
   }
 
   // ---------- render ----------
+  function buckets() {
+    const t = today(), end = plusDays(t, 7);
+    const visible = state.tasks.filter((x) => !x.done || state.justDone.has(x.id));
+    return {
+      overdue: visible.filter((x) => x.due && x.due < t).sort(byPrio),
+      dueToday: visible.filter((x) => x.due === t).sort(byPrio),
+      next: visible.filter((x) => x.due > t && x.due <= end).sort((a, b) => a.due.localeCompare(b.due) || byPrio(a, b))
+    };
+  }
+  const openCount = (arr) => arr.filter((x) => !x.done).length;
+
   function renderAll(failed = {}) {
-    $("datestamp").textContent = today() + " " + DAYS[new Date().getDay()];
+    const d = new Date();
+    $("eyebrow").textContent = "Hub Today · " + DAYS_LONG[d.getDay()];
+    $("dateTitle").textContent = d.getDate() + " " + MONTHS_LONG[d.getMonth()];
+    renderSummary();
     renderProjectSelect();
     renderTasks(failed.t);
     renderJournal(failed.j);
     renderProjects(failed.p);
   }
+  function renderSummary() {
+    const box = $("summary"); box.replaceChildren();
+    if (!state.loaded) { box.textContent = state.busy ? "Connecting to Notion…" : "Not connected to Notion"; return; }
+    const b = buckets(), late = openCount(b.overdue), now = openCount(b.dueToday);
+    const active = state.projects.filter((p) => p.status === "Active").length;
+    const parts = [];
+    if (now) parts.push(plural(now, "task") + " due today"); else parts.push("Nothing due today");
+    box.append(parts[0]);
+    if (late) { box.append(" · "); box.append(el("span", { class: "late", text: late + " overdue" })); }
+    if (active) box.append(" · " + plural(active, "active project"));
+  }
   function projectName(id) { const p = state.projects.find((x) => x.id === id); return p ? p.name : ""; }
   const byPrio = (a, b) => (PRIO_ORDER[a.prio] ?? 3) - (PRIO_ORDER[b.prio] ?? 3) || (a.due || "9").localeCompare(b.due || "9");
 
+  function emptyRow(title, body) { return el("li", { class: "empty" }, el("strong", { text: title }), body || null); }
+
   function renderTasks(failed) {
     const list = $("taskList"); list.replaceChildren();
-    const t = today(), end = plusDays(t, 7);
-    const visible = state.tasks.filter((x) => !x.done || state.justDone.has(x.id));
-    const overdue = visible.filter((x) => x.due && x.due < t).sort(byPrio);
-    const dueToday = visible.filter((x) => x.due === t).sort(byPrio);
-    const next = visible.filter((x) => x.due > t && x.due <= end).sort((a, b) => a.due.localeCompare(b.due) || byPrio(a, b));
-    const openCount = (arr) => arr.filter((x) => !x.done).length;
-    $("cToday").textContent = openCount(overdue) + openCount(dueToday) ? String(openCount(overdue) + openCount(dueToday)) : "";
-    $("cNext").textContent = openCount(next) ? String(openCount(next)) : "";
-    $("tabToday").setAttribute("aria-selected", state.tab === "today");
-    $("tabNext").setAttribute("aria-selected", state.tab === "next");
+    const b = buckets();
+    const nToday = openCount(b.overdue) + openCount(b.dueToday), nNext = openCount(b.next);
+    $("cToday").textContent = nToday ? String(nToday) : "";
+    $("cNext").textContent = nNext ? String(nNext) : "";
+    $("tabToday").setAttribute("aria-selected", String(state.tab === "today"));
+    $("tabNext").setAttribute("aria-selected", String(state.tab === "next"));
 
-    if (failed && !state.tasks.length) { list.append(el("li", { class: "empty", text: "Tasks couldn't load. See the message above." })); return; }
-    if (!state.loaded && !state.tasks.length) { list.append(el("li", { class: "empty", text: "Waiting for Notion…" })); return; }
+    if (failed && !state.tasks.length) { list.append(emptyRow("Tasks couldn't load", "See the message above.")); return; }
+    if (!state.loaded && !state.tasks.length) { list.append(emptyRow("Waiting for Notion…")); return; }
     if (state.tab === "today") {
-      if (!overdue.length && !dueToday.length) { list.append(el("li", { class: "empty", text: "Nothing due today. Add a task above or check Next 7 days." })); return; }
-      if (overdue.length) { list.append(el("li", { class: "subhead", text: "Overdue" })); overdue.forEach((x) => list.append(taskRow(x, true))); }
-      if (dueToday.length) { if (overdue.length) list.append(el("li", { class: "subhead plain", text: "Due today" })); dueToday.forEach((x) => list.append(taskRow(x, false))); }
+      if (!b.overdue.length && !b.dueToday.length) { list.append(emptyRow("Nothing due today", "Add a task above, or check the next 7 days.")); return; }
+      if (b.overdue.length) { list.append(el("li", { class: "subhead late", text: "Overdue" })); b.overdue.forEach((x) => list.append(taskRow(x, true))); }
+      if (b.dueToday.length) { if (b.overdue.length) list.append(el("li", { class: "subhead", text: "Due today" })); b.dueToday.forEach((x) => list.append(taskRow(x, false))); }
     } else {
-      if (!next.length) { list.append(el("li", { class: "empty", text: "Nothing due in the next 7 days." })); return; }
-      next.forEach((x) => list.append(taskRow(x, false)));
+      if (!b.next.length) { list.append(emptyRow("Nothing in the next 7 days", "Tasks with a due date in the coming week show up here.")); return; }
+      b.next.forEach((x) => list.append(taskRow(x, false)));
     }
   }
   function taskRow(x, late) {
-    const cb = el("input", { type: "checkbox", class: "check", "aria-label": "Mark " + x.name + " done" });
+    const cb = el("input", { type: "checkbox", class: "check", "aria-label": (x.done ? "Mark not done: " : "Mark done: ") + x.name });
     cb.checked = x.done;
     cb.addEventListener("change", () => toggleDone(x, cb));
     const meta = el("div", { class: "meta" });
-    if (x.prio) meta.append(el("span", { class: "chip p-" + x.prio, text: x.prio }));
-    if (x.due) meta.append(el("span", { class: "chip mono" + (late && !x.done ? " late" : ""), text: dueLabel(x.due) }));
-    x.projects.forEach((pid) => { const n = projectName(pid); if (n) meta.append(el("span", { class: "chip", text: n })); });
-    if (x.parent.length) { const parent = state.tasks.find((t) => t.id === x.parent[0]); if (parent) meta.append(el("span", { class: "chip", text: "↳ " + parent.name })); }
-    return el("li", { class: "task" + (late ? " overdue" : "") + (x.done ? " done" : "") }, cb,
-      el("div", { class: "task-main" }, el("a", { class: "task-name", href: x.url, target: "_blank", rel: "noopener", text: x.name }), meta));
+    if (x.prio) meta.append(el("span", { class: "prio" }, el("span", { class: "pdot " + x.prio }), x.prio));
+    if (x.due && (state.tab !== "today" || late)) meta.append(el("span", { class: "num" + (late && !x.done ? " late" : ""), text: dueLabel(x.due) }));
+    x.projects.forEach((pid) => { const n = projectName(pid); if (n) meta.append(el("span", { text: n })); });
+    const parent = x.parent.length ? state.tasks.find((t) => t.id === x.parent[0]) : null;
+    return el("li", { class: "task" + (x.done ? " done" : "") }, cb,
+      el("div", { class: "task-main" },
+        x.url ? el("a", { class: "task-name", href: x.url, target: "_blank", rel: "noopener", text: x.name }) : el("span", { class: "task-name", text: x.name }),
+        meta.childNodes.length ? meta : null,
+        parent ? el("div", { class: "parent", text: "↳ Subtask of " + parent.name }) : null));
   }
 
   function renderProjectSelect() {
     const sel = $("qaProject"); const keep = sel.value;
-    sel.replaceChildren(el("option", { value: "", text: "No project" }));
+    sel.replaceChildren(el("option", { value: "", text: "None" }));
     state.projects.filter((p) => p.status !== "Done").sort((a, b) => a.name.localeCompare(b.name))
       .forEach((p) => sel.append(el("option", { value: p.id, text: p.name })));
     sel.value = keep && [...sel.options].some((o) => o.value === keep) ? keep : "";
@@ -344,50 +480,58 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
   function renderProjects(failed) {
     const box = $("projects"); box.replaceChildren();
     const active = state.projects.filter((p) => p.status === "Active").sort((a, b) => (a.target || "9").localeCompare(b.target || "9"));
-    if (failed && !state.projects.length) { box.append(el("div", { class: "empty", text: "Projects couldn't load. See the message above." })); return; }
-    if (!active.length) { box.append(el("div", { class: "empty", text: state.loaded ? "No active projects. Set a project's Status to Active in Notion to see it here." : "Waiting for Notion…" })); return; }
+    if (failed && !state.projects.length) { box.append(el("div", { class: "empty" }, el("strong", { text: "Projects couldn't load" }), "See the message above.")); return; }
+    if (!active.length) {
+      box.append(state.loaded
+        ? el("div", { class: "empty" }, el("strong", { text: "No active projects" }), "Set a project's Status to Active in Notion to see it here.")
+        : el("div", { class: "empty" }, el("strong", { text: "Waiting for Notion…" })));
+      return;
+    }
     active.forEach((p) => {
       const ts = state.tasks.filter((t) => t.projects.includes(p.id));
       const done = ts.filter((t) => t.done).length;
       const pct = ts.length ? Math.round((done / ts.length) * 100) : 0;
-      const bar = el("div", { class: "bar", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct), "aria-label": p.name + " progress" }, el("span"));
+      const bar = el("div", { class: "bar" + (pct === 100 ? " full" : ""), role: "progressbar", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": String(pct), "aria-label": p.name + " progress" }, el("span"));
       bar.firstChild.style.width = pct + "%";
       box.append(el("div", { class: "proj" },
         el("div", { class: "proj-top" }, el("a", { href: p.url, target: "_blank", rel: "noopener", text: p.name }), el("span", { class: "mono", text: pct + "%" })),
         bar,
-        el("div", { class: "proj-meta" }, el("span", { text: ts.length ? done + " of " + ts.length + " tasks done" : "No tasks yet" }),
-          el("span", { class: "mono", text: p.target ? "Target " + shortDate(p.target) : (p.area || "") }))));
+        el("div", { class: "proj-meta" },
+          el("span", { text: ts.length ? done + " of " + plural(ts.length, "task") + " done" : "No tasks yet" }),
+          el("span", { class: "num", text: p.target ? "Target " + shortDate(p.target) : (p.area || "") }))));
     });
   }
 
   let pickedMood = "";
   function renderJournal(failed) {
     const box = $("journal"); box.replaceChildren();
-    if (failed && !state.journal) { box.append(el("div", { class: "empty", text: "The journal couldn't load. See the message above." })); return; }
-    if (!state.loaded && !state.journal) { box.append(el("div", { class: "empty", text: "Waiting for Notion…" })); return; }
+    if (failed && !state.journal) { box.append(el("div", { class: "empty" }, el("strong", { text: "The journal couldn't load" }), "See the message above.")); return; }
+    if (!state.loaded && !state.journal) { box.append(el("div", { class: "empty" }, el("strong", { text: "Waiting for Notion…" }))); return; }
     const j = state.journal;
+    const d = new Date();
     if (j) {
-      box.append(el("div", { class: "j-title" },
-        el("strong", { text: j.name || today() }),
-        el("span", { class: "hint", text: j.mood ? "Mood: " + j.mood : "" }),
-        el("a", { href: j.url, target: "_blank", rel: "noopener", text: "Open entry" })));
-      const input = el("input", { class: "field", id: "logInput", placeholder: "Add a line to today's log…", "aria-label": "Log line" });
-      const btn = el("button", { class: "btn btn-primary", type: "submit", text: "Add" });
-      const form = el("form", { class: "log-row", autocomplete: "off" }, input, btn);
+      box.append(el("div", { class: "j-head" },
+        el("div", {}, el("p", { class: "eyebrow", text: "Today's entry" }), el("p", { class: "j-date", text: j.name || today() })),
+        j.mood ? el("span", { class: "mood-tag", text: j.mood }) : null));
+      const input = el("input", { id: "logInput", placeholder: "Log a thought, a win, a note…", "aria-label": "Add a line to today's entry", maxlength: "1900" });
+      const btn = el("button", { class: "btn btn-primary", type: "submit", text: "Log" });
+      const form = el("form", { class: "inline-input", autocomplete: "off" }, input, btn);
       form.addEventListener("submit", (ev) => { ev.preventDefault(); appendLog(j, input, btn); });
-      box.append(form, el("p", { class: "hint", text: "Each line is added to the end of today's entry with the time in front." }));
+      box.append(form, el("div", { class: "j-foot" },
+        el("span", { class: "hint", text: "Lines go to the end of the entry, with the time in front." }),
+        j.url ? el("a", { href: j.url, target: "_blank", rel: "noopener", text: "Open entry ↗" }) : null));
     } else {
-      const d = new Date();
-      box.append(el("div", { class: "j-title" }, el("strong", { text: today() + " " + DAYS[d.getDay()] }), el("span", { class: "hint", text: "No entry yet" })));
-      const moods = el("div", { class: "moods", role: "group", "aria-label": "Mood" });
+      box.append(el("div", { class: "j-head" },
+        el("div", {}, el("p", { class: "eyebrow", text: "No entry yet" }), el("p", { class: "j-date", text: today() + " " + DAYS[d.getDay()] }))));
+      const moods = el("div", { class: "moods", role: "group", "aria-label": "How's today going?" });
       MOODS.forEach((m) => {
         const b = el("button", { class: "mood", type: "button", "aria-pressed": String(pickedMood === m), text: m });
-        b.addEventListener("click", () => { pickedMood = pickedMood === m ? "" : m; renderJournal(); });
+        b.addEventListener("click", () => { pickedMood = pickedMood === m ? "" : m; moods.querySelectorAll(".mood").forEach((x) => x.setAttribute("aria-pressed", String(x.textContent === pickedMood))); });
         moods.append(b);
       });
       const start = el("button", { class: "btn btn-primary", type: "button", id: "startEntry", text: "Start today's entry" });
       start.addEventListener("click", () => createEntry(start));
-      box.append(moods, el("div", {}, start), el("p", { class: "hint", text: "Creates the entry with the outline: Top 3 today, Notes / log, Wins, Tomorrow." }));
+      box.append(moods, el("div", { class: "j-foot" }, start, el("span", { class: "hint", text: "Top 3 · Notes / log · Wins · Tomorrow" })));
     }
   }
 
@@ -397,11 +541,10 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
     cb.disabled = true;
     try {
       await api("PATCH", "/api/tasks/" + x.id, { done: nowDone });
-      cb.disabled = false;
       x.done = nowDone; x.status = nowDone ? "Done" : "To do";
       if (nowDone) state.justDone.add(x.id); else state.justDone.delete(x.id);
-      toast(nowDone ? "Marked done" : "Marked not done");
-      renderTasks(); renderProjects();
+      toast(nowDone ? "Done" : "Marked not done");
+      renderTasks(); renderProjects(); renderSummary();
     } catch (e) {
       cb.checked = !nowDone; cb.disabled = false;
       showNotice(errMsg(e));
@@ -420,10 +563,11 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
       $("qaName").value = "";
       if (due && due > today() && due <= plusDays(today(), 7)) state.tab = "next";
       else if (due && due <= today()) state.tab = "today";
-      toast(due ? "Task added, due " + dueLabel(due) : "Task added (no due date, so it's only in Notion's lists)");
-      hideNotice(); renderTasks(); renderProjects();
+      const label = due ? dueLabel(due) : "";
+      toast(due ? "Added · due " + (/^(Today|Tomorrow|Yesterday)$/.test(label) ? label.toLowerCase() : label) : "Added to Notion (no due date)");
+      hideNotice(); renderTasks(); renderProjects(); renderSummary();
     } catch (e) { showNotice(errMsg(e)); }
-    btn.disabled = false; btn.textContent = "Add task";
+    btn.disabled = false; btn.textContent = "Add";
   }
 
   async function createEntry(btn) {
@@ -432,16 +576,17 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
     try {
       state.journal = await api("POST", "/api/journal", { date: t, name, mood: pickedMood });
       pickedMood = ""; toast("Today's entry created"); hideNotice(); renderJournal();
+      const li = $("logInput"); if (li) li.focus();
     } catch (e) { showNotice(errMsg(e)); btn.disabled = false; btn.textContent = "Start today's entry"; }
   }
 
   async function appendLog(j, input, btn) {
     const text = input.value.trim(); if (!text) return;
-    const d = new Date(); const line = "- " + pad(d.getHours()) + ":" + pad(d.getMinutes()) + " " + text.replace(/\n+/g, " ");
+    const d = new Date(); const line = pad(d.getHours()) + ":" + pad(d.getMinutes()) + " " + text.replace(/\n+/g, " ");
     btn.disabled = true;
     try {
-      await api("POST", "/api/journal/" + j.id + "/log", { line: line.slice(2) });
-      input.value = ""; toast("Added to today's entry"); hideNotice();
+      await api("POST", "/api/journal/" + j.id + "/log", { line });
+      input.value = ""; toast("Logged at " + line.slice(0, 5)); hideNotice();
     } catch (e) { showNotice(errMsg(e)); }
     btn.disabled = false; input.focus();
   }
@@ -454,12 +599,20 @@ header { display: flex; align-items: flex-end; justify-content: space-between; g
     state.prio = b.dataset.p;
     $("qaPrio").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
   });
-  $("tabToday").addEventListener("click", () => { state.tab = "today"; renderTasks(); });
-  $("tabNext").addEventListener("click", () => { state.tab = "next"; renderTasks(); });
+  function selectTab(name) { state.tab = name; renderTasks(); }
+  $("tabToday").addEventListener("click", () => selectTab("today"));
+  $("tabNext").addEventListener("click", () => selectTab("next"));
+  document.querySelector(".tabs").addEventListener("keydown", (ev) => {
+    if (ev.key !== "ArrowLeft" && ev.key !== "ArrowRight") return;
+    const next = state.tab === "today" ? "next" : "today";
+    selectTab(next); $(next === "today" ? "tabToday" : "tabNext").focus();
+  });
   $("refreshBtn").addEventListener("click", () => { state.justDone.clear(); load(); });
   $("noticeRetry").addEventListener("click", () => load());
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && state.loaded) load(); });
-  renderAll();
+  const d0 = new Date();
+  $("eyebrow").textContent = "Hub Today · " + DAYS_LONG[d0.getDay()];
+  $("dateTitle").textContent = d0.getDate() + " " + MONTHS_LONG[d0.getMonth()];
 
   load();
 })();
